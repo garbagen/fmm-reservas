@@ -6,7 +6,7 @@ const calendar = {
     selectedDate: null,
     selectedSiteId: null,
     availability: {},
-    baseUrl: 'http://localhost:3000', // Update this to match your backend URL
+    baseUrl: 'https://fmm-reservas-api.onrender.com', // Update this to match your backend URL
 
     async init(siteId) {
         console.log('Initializing calendar with siteId:', siteId);

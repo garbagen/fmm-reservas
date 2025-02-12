@@ -412,5 +412,5 @@ app.use((error, req, res, next) => {
 // Start the server
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on https://fmm-reservas-api.onrender.com:${PORT}`);
 });

@@ -127,13 +127,13 @@ async function loadTimeSlots(isDropdownClick = false) {
 
     try {
         // Get site details
-        const siteResponse = await fetch(`http://localhost:3000/api/sites/${selectedSite}`);
+        const siteResponse = await fetch(`https://fmm-reservas-api.onrender.com/api/sites/${selectedSite}`);
         if (!siteResponse.ok) throw new Error('Failed to fetch site details');
         const site = await siteResponse.json();
 
         // Get current availability for this date
         const date = dateInput.value;
-        const availabilityResponse = await fetch(`http://localhost:3000/api/sites/${selectedSite}/availability/${date.substring(0, 7)}`);
+        const availabilityResponse = await fetch(`https://fmm-reservas-api.onrender.com/api/sites/${selectedSite}/availability/${date.substring(0, 7)}`);
         if (!availabilityResponse.ok) throw new Error('Failed to fetch availability');
         const availability = await availabilityResponse.json();
 
@@ -195,7 +195,7 @@ async function loadTimeSlots(isDropdownClick = false) {
 
 async function getSiteById(siteId) {
     try {
-        const response = await fetch(`http://localhost:3000/api/sites/${siteId}`);
+        const response = await fetch(`https://fmm-reservas-api.onrender.com/api/sites/${siteId}`);
         if (!response.ok) {
             throw new Error('Error fetching site details');
         }
@@ -257,7 +257,7 @@ async function submitBooking(event) {
         console.log('Sending booking data:', bookingData);  // Debug log
 
         // Submit booking
-        const response = await fetch('http://localhost:3000/api/bookings', {
+        const response = await fetch('https://fmm-reservas-api.onrender.com/api/bookings', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
