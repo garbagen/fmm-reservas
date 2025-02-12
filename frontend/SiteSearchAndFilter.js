@@ -12,7 +12,7 @@ const SiteSearchAndFilter = () => {
   useEffect(() => {
     const fetchSites = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/sites');
+        const response = await fetch('https://fmm-reservas-api.onrender.com/api/sites');
         const data = await response.json();
         setSites(data);
         setFilteredSites(data);

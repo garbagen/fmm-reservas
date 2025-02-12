@@ -101,7 +101,7 @@ async function loadSites() {
     toggleLoading(true, 'sites-list');
 
     try {
-        const response = await fetch('http://localhost:3000/api/sites', {
+        const response = await fetch('https://fmm-reservas-api.onrender.com/api/sites', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -214,7 +214,7 @@ async function saveSite(button) {
             formData.append('image', imageInput.files[0]);
 
             try {
-                const uploadResponse = await fetch('http://localhost:3000/api/sites/upload', {
+                const uploadResponse = await fetch('https://fmm-reservas-api.onrender.com/api/sites/upload', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -257,7 +257,7 @@ async function saveSite(button) {
         // Save the site
         const siteId = editor.dataset.siteId;
         const method = siteId ? 'PUT' : 'POST';
-        const url = `http://localhost:3000/api/sites${siteId ? '/' + siteId : ''}`;
+        const url = `https://fmm-reservas-api.onrender.com/api/sites${siteId ? '/' + siteId : ''}`;
 
         const saveResponse = await fetch(url, {
             method,
@@ -339,7 +339,7 @@ async function deleteSite(button) {
     toggleLoading(true, editor.id || 'sites-list');
 
     try {
-        const response = await fetch(`http://localhost:3000/api/sites/${siteId}`, {
+        const response = await fetch(`https://fmm-reservas-api.onrender.com/api/sites/${siteId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -370,7 +370,7 @@ async function loadBookings() {
     
     try {
         // First, fetch all sites to get the names
-        const sitesResponse = await fetch('http://localhost:3000/api/sites', {
+        const sitesResponse = await fetch('https://fmm-reservas-api.onrender.com/api/sites', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -384,7 +384,7 @@ async function loadBookings() {
         });
         
         // Now fetch bookings
-        const response = await fetch('http://localhost:3000/api/bookings', {
+        const response = await fetch('https://fmm-reservas-api.onrender.com/api/bookings', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -525,7 +525,7 @@ async function deleteBooking(bookingId) {
     }
     
     try {
-        const response = await fetch(`http://localhost:3000/api/bookings/${bookingId}`, {
+        const response = await fetch(`https://fmm-reservas-api.onrender.com/api/bookings/${bookingId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -562,7 +562,7 @@ async function deleteSelectedBookings() {
     
     try {
         for (const bookingId of selectedBookings) {
-            await fetch(`http://localhost:3000/api/bookings/${bookingId}`, {
+            await fetch(`https://fmm-reservas-api.onrender.com/api/bookings/${bookingId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`

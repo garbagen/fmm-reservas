@@ -5,7 +5,7 @@ let allSites = [];
 window.addEventListener('load', async () => {
     try {
         // Fetch sites
-        const response = await fetch('http://localhost:3000/api/sites');
+        const response = await fetch('https://fmm-reservas-api.onrender.com/api/sites');
         allSites = await response.json();
         
         // Add event listeners for search and filter
