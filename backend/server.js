@@ -383,9 +383,13 @@ app.use('/uploads', express.static('uploads'));
 
 // CORS configuration for Render
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-        ? ['https://fmm-reservas.onrender.com', 'http://localhost:5173']
-        : 'http://localhost:5173',
+    origin: [
+        'https://fmm-reservas.onrender.com',    // Your Render frontend URL
+        'http://localhost:5173',                // Local development frontend
+        'http://localhost:3000'                 // Local development alternate
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
 

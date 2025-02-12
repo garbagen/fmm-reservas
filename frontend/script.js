@@ -64,9 +64,9 @@ function displaySites(sites) {
         return `
             <div class="site-card">
                 <div class="site-image">
-                    <img src="${site.imageUrl ? 'http://localhost:3000' + site.imageUrl : '/placeholder-image.jpg'}" 
+                    <img src="${site.imageUrl ? + site.imageUrl : '/images/placeholder-image.jpg'}" 
                          alt="${site.name}"
-                         onerror="this.src='/placeholder-image.jpg'">
+                         onerror="this.src='/images/placeholder-image.jpg'">
                 </div>
                 <h2>${site.name}</h2>
                 <p>${site.description}</p>
