@@ -1,9 +1,10 @@
 // DashboardAnalytics.js
-const DashboardAnalytics = () => {
+window.DashboardAnalytics = function() {
+    // Get Recharts components from global scope
     const {
         LineChart, Line, BarChart, Bar, XAxis, YAxis,
         CartesianGrid, Tooltip, Legend, ResponsiveContainer
-    } = Recharts;
+    } = window.Recharts;
 
     const [bookingStats, setBookingStats] = React.useState({
         daily: [],
@@ -65,16 +66,32 @@ const DashboardAnalytics = () => {
 
     if (bookingStats.loading) {
         return React.createElement('div', {
-            className: 'loading-spinner'
-        });
+            style: {
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '20px'
+            }
+        }, 'Loading...');
     }
 
     return React.createElement('div', { className: 'analytics-dashboard' },
-        // Daily Bookings Chart
         React.createElement('div', { className: 'chart-container' },
-            React.createElement('h3', {}, 'Daily Bookings (Last 14 Days)'),
-            React.createElement(ResponsiveContainer, { width: '100%', height: 300 },
-                React.createElement(LineChart, { data: bookingStats.daily },
+            React.createElement('h3', { 
+                style: { 
+                    marginBottom: '15px',
+                    fontSize: '18px',
+                    fontWeight: 'bold'
+                }
+            }, 'Daily Bookings (Last 14 Days)'),
+            React.createElement(ResponsiveContainer, { 
+                width: '100%', 
+                height: 300,
+                className: 'chart'
+            },
+                React.createElement(LineChart, { 
+                    data: bookingStats.daily,
+                    margin: { top: 5, right: 30, left: 20, bottom: 5 }
+                },
                     React.createElement(CartesianGrid, { strokeDasharray: '3 3' }),
                     React.createElement(XAxis, { dataKey: 'date' }),
                     React.createElement(YAxis),
@@ -83,16 +100,29 @@ const DashboardAnalytics = () => {
                     React.createElement(Line, {
                         type: 'monotone',
                         dataKey: 'bookings',
-                        stroke: '#8884d8'
+                        stroke: '#8884d8',
+                        activeDot: { r: 8 }
                     })
                 )
             )
         ),
-        // Monthly Bookings Chart
         React.createElement('div', { className: 'chart-container' },
-            React.createElement('h3', {}, 'Monthly Bookings'),
-            React.createElement(ResponsiveContainer, { width: '100%', height: 300 },
-                React.createElement(BarChart, { data: bookingStats.monthly },
+            React.createElement('h3', { 
+                style: { 
+                    marginBottom: '15px',
+                    fontSize: '18px',
+                    fontWeight: 'bold'
+                } 
+            }, 'Monthly Bookings'),
+            React.createElement(ResponsiveContainer, { 
+                width: '100%', 
+                height: 300,
+                className: 'chart'
+            },
+                React.createElement(BarChart, { 
+                    data: bookingStats.monthly,
+                    margin: { top: 5, right: 30, left: 20, bottom: 5 }
+                },
                     React.createElement(CartesianGrid, { strokeDasharray: '3 3' }),
                     React.createElement(XAxis, { dataKey: 'month' }),
                     React.createElement(YAxis),
@@ -107,6 +137,3 @@ const DashboardAnalytics = () => {
         )
     );
 };
-
-// Export the component
-window.DashboardAnalytics = DashboardAnalytics;
