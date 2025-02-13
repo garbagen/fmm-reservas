@@ -10,6 +10,7 @@ const upload = require('./middleware/uploadMiddleware');
 
 const app = express();
 const path = require('path');
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(express.json());

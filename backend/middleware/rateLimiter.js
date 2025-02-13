@@ -1,5 +1,3 @@
-// Location: backend/middleware/rateLimiter.js
-
 const rateLimit = require('express-rate-limit');
 
 // Create a limiter for general API endpoints
@@ -10,8 +8,14 @@ const apiLimiter = rateLimit({
         error: 'Too many requests, please try again later.',
         statusCode: 429
     },
-    standardHeaders: true, 
-    legacyHeaders: false 
+    standardHeaders: true,
+    legacyHeaders: false,
+    // Add these options
+    trustProxy: true,
+    skip: (req) => {
+        // Skip rate limiting for development environment
+        return process.env.NODE_ENV === 'development';
+    }
 });
 
 // Create a stricter limiter for login attempts
@@ -23,7 +27,13 @@ const authLimiter = rateLimit({
         statusCode: 429
     },
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    // Add these options
+    trustProxy: true,
+    skip: (req) => {
+        // Skip rate limiting for development environment
+        return process.env.NODE_ENV === 'development';
+    }
 });
 
 module.exports = {
