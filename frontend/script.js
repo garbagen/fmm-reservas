@@ -47,6 +47,8 @@ function filterSites() {
     displaySites(filteredSites);
 }
 
+// In script.js, replace the displaySites function with this updated version
+
 function displaySites(sites) {
     const container = document.querySelector('.sites-container');
     
@@ -60,15 +62,19 @@ function displaySites(sites) {
     }
     
     container.innerHTML = sites.map(site => {
-        console.log('Site image URL:', site.imageUrl); // Debug log
-        
-        const defaultImage = 'https://res.cloudinary.com/ydbripkyv7/image/upload/v1707783495/heritage-sites/placeholder.jpg';
-        
+        // Use a data URI for the default image
+        const defaultImage = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22300%22%20height%3D%22200%22%20fill%3D%22%23cccccc%22%2F%3E%3Ctext%20x%3D%22150%22%20y%3D%22100%22%20font-size%3D%2214%22%20text-anchor%3D%22middle%22%20alignment-baseline%3D%22middle%22%20fill%3D%22%23333333%22%3ENo Image Available%3C%2Ftext%3E%3C%2Fsvg%3E';
+
+        // Check if site.imageUrl exists and is valid
+        const imageUrl = site.imageUrl && site.imageUrl.startsWith('http') 
+            ? site.imageUrl 
+            : defaultImage;
+
         return `
             <div class="site-card">
                 <div class="site-image">
                     <img 
-                        src="${site.imageUrl || defaultImage}" 
+                        src="${imageUrl}" 
                         alt="${site.name}"
                         onerror="this.src='${defaultImage}'"
                         class="site-thumbnail"
