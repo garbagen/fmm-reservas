@@ -394,23 +394,11 @@ app.delete('/api/bookings/:id', authenticateToken, async (req, res) => {
 app.post('/api/sites/upload', authenticateToken, upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
-            console.log('No file received in upload');
             return res.status(400).json({ error: 'No file uploaded' });
         }
-        
-        console.log('File upload successful:', {
-            originalname: req.file.originalname,
-            path: req.file.path,
-            size: req.file.size,
-            cloudinaryResponse: req.file // Add this line for debugging
-        });
-        
-        let imageUrl = req.file.path;
-        
-        if (imageUrl.includes('res.cloudinary.com')) {
-            const urlParts = imageUrl.split('/upload/');
-            imageUrl = urlParts[0] + '/upload/' + urlParts[1].split('/').pop();
-        }
+
+        // req.file.path should now contain the complete URL including version number
+        const imageUrl = req.file.path;
         
         res.json({ 
             imageUrl,

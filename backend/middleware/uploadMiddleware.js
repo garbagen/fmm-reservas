@@ -13,7 +13,11 @@ const storage = new CloudinaryStorage({
     params: {
         folder: 'heritage-sites',
         allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
-        transformation: [{ width: 1000, height: 1000, crop: 'limit' }]
+        transformation: [{ width: 800, height: 600, crop: 'fill' }],
+        format: 'jpg',
+        // This ensures we get back the complete URL including version
+        use_filename: true,
+        unique_filename: true
     }
 });
 
