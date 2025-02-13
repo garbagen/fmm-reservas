@@ -5,19 +5,31 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { apiLimiter, authLimiter } = require('./middleware/rateLimiter');
 require('dotenv').config();
+const cloudinary = require('cloudinary').v2;
 
 const upload = require('./middleware/uploadMiddleware');
 
 const app = express();
 const path = require('path');
+
+// Cloudinary Configuration
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+console.log('Cloudinary Configuration:', {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    configured: !!cloudinary.config().cloud_name
+});
+
 app.set('trust proxy', 1);
 
 // Middleware
 app.use(express.json());
-app.use(cors());
 app.use('/api/', apiLimiter);
 app.use('/api/auth/', authLimiter);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // MongoDB Connection String
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -101,6 +113,19 @@ const authenticateToken = async (req, res, next) => {
     }
 };
 
+// CORS configuration for Render
+app.use(cors({
+    origin: [
+        'https://fmm-reservas.onrender.com',    
+        'http://localhost:5173',                
+        'http://localhost:3000'                 
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
+
 // Login Route
 app.post('/api/auth/login', async (req, res) => {
     try {
@@ -135,8 +160,10 @@ app.post('/api/auth/login', async (req, res) => {
 app.get('/api/sites', async (req, res) => {
     try {
         const sites = await Site.find();
+        console.log('Sites data:', sites); // Debug log
         res.json(sites);
     } catch (error) {
+        console.error('Error reading sites:', error);
         res.status(500).json({ error: 'Error reading sites' });
     }
 });
@@ -362,48 +389,57 @@ app.delete('/api/bookings/:id', authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Error deleting booking' });
     }
 });
+
 // Add this route after your existing routes
 app.post('/api/sites/upload', authenticateToken, upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
+            console.log('No file received in upload');
             return res.status(400).json({ error: 'No file uploaded' });
         }
         
-        // Log the Cloudinary response
-        console.log('Cloudinary upload response:', req.file);
+        console.log('File upload successful:', {
+            originalname: req.file.originalname,
+            path: req.file.path,
+            size: req.file.size,
+            cloudinaryResponse: req.file // Add this line for debugging
+        });
         
-        // The URL will be in req.file.path
-        const imageUrl = req.file.path;
+        let imageUrl = req.file.path;
+        
+        if (imageUrl.includes('res.cloudinary.com')) {
+            const urlParts = imageUrl.split('/upload/');
+            imageUrl = urlParts[0] + '/upload/' + urlParts[1].split('/').pop();
+        }
         
         res.json({ 
             imageUrl,
-            message: 'Upload successful'
+            success: true
         });
     } catch (error) {
-        console.error('Upload error:', error);
+        console.error('Upload error details:', error);
         res.status(500).json({ 
             error: 'Error uploading file',
-            details: error.message 
+            details: error.message
         });
     }
 });
 
-// Serve uploaded files
-app.use('/uploads', express.static('uploads'));
-
 // Add these configurations to your existing server.js
+// Cloudinary test endpoint
+app.get('/api/test-cloudinary', async (req, res) => {
+    try {
+        const result = await cloudinary.uploader.upload(
+            'https://res.cloudinary.com/demo/image/upload/sample.jpg',
+            { folder: 'heritage-sites' }
+        );
+        res.json({ success: true, result });
+    } catch (error) {
+        console.error('Cloudinary test error:', error);
+        res.json({ success: false, error: error.message });
+    }
+});
 
-// CORS configuration for Render
-app.use(cors({
-    origin: [
-        'https://fmm-reservas.onrender.com',    // Your Render frontend URL
-        'http://localhost:5173',                // Local development frontend
-        'http://localhost:3000'                 // Local development alternate
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-}));
 
 // Health check endpoint for Render
 app.get('/health', (req, res) => {

@@ -60,13 +60,20 @@ function displaySites(sites) {
     }
     
     container.innerHTML = sites.map(site => {
+        console.log('Site image URL:', site.imageUrl); // Debug log
+        
+        const defaultImage = 'https://res.cloudinary.com/ydbripkyv7/image/upload/v1707783495/heritage-sites/placeholder.jpg';
+        
         return `
-               <div class="site-card">
-        <div class="site-image">
-            <img src="${site.imageUrl || 'https://res.cloudinary.com/ydbripkyv7/image/upload/v1/heritage-sites/placeholder-image'}" 
-                 alt="${site.name}"
-                 onerror="this.src='https://res.cloudinary.com/ydbripkyv7/image/upload/v1/heritage-sites/placeholder-image'">
-        </div>
+            <div class="site-card">
+                <div class="site-image">
+                    <img 
+                        src="${site.imageUrl || defaultImage}" 
+                        alt="${site.name}"
+                        onerror="this.src='${defaultImage}'"
+                        class="site-thumbnail"
+                    >
+                </div>
                 <h2>${site.name}</h2>
                 <p>${site.description}</p>
                 <div class="time-slots">
