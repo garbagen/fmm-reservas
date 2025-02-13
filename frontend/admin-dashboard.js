@@ -210,7 +210,18 @@ function addTimeSlot(button, existingSlot = null) {
 function removeTimeSlot(button) {
     button.closest('.slot-item').remove();
 }
-
+// Add this helper function for showing notifications
+function showNotification(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <span>${message}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
 async function saveSite(button) {
     const token = checkAuth();
     if (!token) return;
@@ -220,9 +231,17 @@ async function saveSite(button) {
 
     try {
         // Get form data
+        const nameInput = editor.querySelector('.site-name');
+        const descriptionInput = editor.querySelector('.site-description');
+
+        if (!nameInput.value.trim()) {
+            showNotification('Site name is required', 'error');
+            return;
+        }
+
         const siteData = {
-            name: editor.querySelector('.site-name').value,
-            description: editor.querySelector('.site-description').value,
+            name: nameInput.value.trim(),
+            description: descriptionInput.value.trim(),
             timeSlots: []
         };
 
@@ -244,20 +263,28 @@ async function saveSite(button) {
             const formData = new FormData();
             formData.append('image', imageInput.files[0]);
 
-            const uploadResponse = await fetch('https://fmm-reservas-api.onrender.com/api/sites/upload', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
+            try {
+                const uploadResponse = await fetch('https://fmm-reservas-api.onrender.com/api/sites/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
 
-            if (!uploadResponse.ok) {
-                throw new Error('Image upload failed');
+                if (!uploadResponse.ok) {
+                    throw new Error('Image upload failed');
+                }
+
+                const uploadResult = await uploadResponse.json();
+                if (uploadResult.imageUrl) {
+                    siteData.imageUrl = uploadResult.imageUrl;
+                }
+            } catch (error) {
+                console.error('Image upload error:', error);
+                showNotification('Failed to upload image', 'error');
+                return;
             }
-
-            const uploadResult = await uploadResponse.json();
-            siteData.imageUrl = uploadResult.imageUrl;
         }
 
         // Save or update the site
@@ -279,13 +306,39 @@ async function saveSite(button) {
             throw new Error('Failed to save site');
         }
 
-        window.toast.success(siteId ? 'Site updated successfully!' : 'Site created successfully!');
+        showNotification(siteId ? 'Site updated successfully!' : 'Site created successfully!');
         await loadSites(); // Refresh the list
     } catch (error) {
         console.error('Error saving site:', error);
-        window.toast.error(error.message || 'Error saving site');
+        showNotification(error.message || 'Error saving site', 'error');
     } finally {
         toggleLoading(false, editor.id || 'sites-list');
+    }
+}
+
+// Update the previewImage function
+function previewImage(input) {
+    const container = input.closest('.image-upload-container');
+    const preview = container.querySelector('#preview-image');
+    const file = input.files[0];
+    
+    if (file) {
+        // Check file size
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            showNotification('Image size should be less than 5MB', 'error');
+            input.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+        };
+        reader.onerror = function() {
+            showNotification('Error reading image file', 'error');
+        };
+        reader.readAsDataURL(file);
     }
 }
 
