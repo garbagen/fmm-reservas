@@ -231,17 +231,9 @@ async function saveSite(button) {
 
     try {
         // Get form data
-        const nameInput = editor.querySelector('.site-name');
-        const descriptionInput = editor.querySelector('.site-description');
-
-        if (!nameInput.value.trim()) {
-            showNotification('Site name is required', 'error');
-            return;
-        }
-
         const siteData = {
-            name: nameInput.value.trim(),
-            description: descriptionInput.value.trim(),
+            name: editor.querySelector('.site-name').value,
+            description: editor.querySelector('.site-description').value,
             timeSlots: []
         };
 
@@ -263,28 +255,20 @@ async function saveSite(button) {
             const formData = new FormData();
             formData.append('image', imageInput.files[0]);
 
-            try {
-                const uploadResponse = await fetch('https://fmm-reservas-api.onrender.com/api/sites/upload', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
+            const uploadResponse = await fetch('https://fmm-reservas-api.onrender.com/api/sites/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
 
-                if (!uploadResponse.ok) {
-                    throw new Error('Image upload failed');
-                }
-
-                const uploadResult = await uploadResponse.json();
-                if (uploadResult.imageUrl) {
-                    siteData.imageUrl = uploadResult.imageUrl;
-                }
-            } catch (error) {
-                console.error('Image upload error:', error);
-                showNotification('Failed to upload image', 'error');
-                return;
+            if (!uploadResponse.ok) {
+                throw new Error('Image upload failed');
             }
+
+            const uploadResult = await uploadResponse.json();
+            siteData.imageUrl = uploadResult.imageUrl;
         }
 
         // Save or update the site
@@ -306,39 +290,13 @@ async function saveSite(button) {
             throw new Error('Failed to save site');
         }
 
-        showNotification(siteId ? 'Site updated successfully!' : 'Site created successfully!');
+        window.toast.success(siteId ? 'Site updated successfully!' : 'Site created successfully!');
         await loadSites(); // Refresh the list
     } catch (error) {
         console.error('Error saving site:', error);
-        showNotification(error.message || 'Error saving site', 'error');
+        window.toast.error(error.message || 'Error saving site');
     } finally {
         toggleLoading(false, editor.id || 'sites-list');
-    }
-}
-
-// Update the previewImage function
-function previewImage(input) {
-    const container = input.closest('.image-upload-container');
-    const preview = container.querySelector('#preview-image');
-    const file = input.files[0];
-    
-    if (file) {
-        // Check file size
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            showNotification('Image size should be less than 5MB', 'error');
-            input.value = '';
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.classList.remove('hidden');
-        };
-        reader.onerror = function() {
-            showNotification('Error reading image file', 'error');
-        };
-        reader.readAsDataURL(file);
     }
 }
 
@@ -438,6 +396,15 @@ async function loadBookings() {
         
         const bookings = await response.json();
         allBookings = bookings; // Store all bookings
+        
+        // Update analytics dashboard if available
+        if (window.DashboardAnalytics && window.React && window.ReactDOM) {
+            const container = document.getElementById('dashboard-analytics');
+            if (container) {
+                ReactDOM.render(React.createElement(window.DashboardAnalytics), container);
+            }
+        }
+        
         updateStats(bookings);
         applyFiltersAndDisplay();
     } catch (error) {
