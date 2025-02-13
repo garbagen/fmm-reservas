@@ -14,11 +14,11 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'heritage-sites',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'gif']
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' }] // Optional: add image transformations
     }
 });
 
-// Create multer upload middleware
 const upload = multer({ storage: storage });
 
 module.exports = upload;

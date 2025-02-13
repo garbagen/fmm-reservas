@@ -368,11 +368,22 @@ app.post('/api/sites/upload', authenticateToken, upload.single('image'), async (
             return res.status(400).json({ error: 'No file uploaded' });
         }
         
-        const imageUrl = `/uploads/${req.file.filename}`;
-        res.json({ imageUrl });
+        // Log the Cloudinary response
+        console.log('Cloudinary upload response:', req.file);
+        
+        // The URL will be in req.file.path
+        const imageUrl = req.file.path;
+        
+        res.json({ 
+            imageUrl,
+            message: 'Upload successful'
+        });
     } catch (error) {
         console.error('Upload error:', error);
-        res.status(500).json({ error: 'Error uploading file' });
+        res.status(500).json({ 
+            error: 'Error uploading file',
+            details: error.message 
+        });
     }
 });
 

@@ -60,19 +60,18 @@ function displaySites(sites) {
     }
     
     container.innerHTML = sites.map(site => {
-        console.log('Displaying site:', site); // Debug log
         return `
-            <div class="site-card">
-                <div class="site-image">
-                    <img src="${site.imageUrl ? + site.imageUrl : '/images/placeholder-image.jpg'}" 
-                         alt="${site.name}"
-                         onerror="this.src='/images/placeholder-image.jpg'">
-                </div>
+               <div class="site-card">
+        <div class="site-image">
+            <img src="${site.imageUrl || 'https://res.cloudinary.com/ydbripkyv7/image/upload/v1/heritage-sites/placeholder-image'}" 
+                 alt="${site.name}"
+                 onerror="this.src='https://res.cloudinary.com/ydbripkyv7/image/upload/v1/heritage-sites/placeholder-image'">
+        </div>
                 <h2>${site.name}</h2>
                 <p>${site.description}</p>
                 <div class="time-slots">
                     ${site.timeSlots
-                        .filter(slot => slot.time) // Filter out empty time slots
+                        .filter(slot => slot.time)
                         .map(slot => `
                             <span class="time-slot">
                                 ${window.datetime.formatTime(slot.time)} 

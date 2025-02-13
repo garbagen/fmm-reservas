@@ -209,7 +209,7 @@ async function saveSite(button) {
         const imageInput = editor.querySelector('.site-image');
         let imageUrl = editor.dataset.imageUrl;
 
-        if (imageInput && imageInput.files && imageInput.files.length > 0) {
+        if (imageInput && imageInput.files && imageInput.files[0]) {
             const formData = new FormData();
             formData.append('image', imageInput.files[0]);
 
@@ -222,17 +222,21 @@ async function saveSite(button) {
                     body: formData
                 });
 
-                if (uploadResponse.ok) {
-                    const uploadResult = await uploadResponse.json();
-                    imageUrl = uploadResult.imageUrl;
+                if (!uploadResponse.ok) {
+                    throw new Error('Image upload failed');
                 }
+
+                const uploadResult = await uploadResponse.json();
+                imageUrl = uploadResult.imageUrl;
+                console.log('Image uploaded successfully:', imageUrl);
             } catch (uploadError) {
                 console.error('Error uploading image:', uploadError);
-                // Continue with save even if image upload fails
+                alert('Error uploading image. Please try again.');
+                return;
             }
         }
 
-        // Prepare site data
+        // Prepare site data with image URL
         const siteData = {
             name: editor.querySelector('.site-name').value,
             description: editor.querySelector('.site-description').value,
@@ -240,56 +244,10 @@ async function saveSite(button) {
             timeSlots: []
         };
 
-        // Get all time slots
-        const slots = editor.querySelectorAll('.slot-item');
-        slots.forEach(slot => {
-            const timeInput = slot.querySelector('.slot-time');
-            const capacityInput = slot.querySelector('.slot-capacity');
-            
-            if (timeInput && capacityInput && timeInput.value && capacityInput.value) {
-                siteData.timeSlots.push({
-                    time: timeInput.value,
-                    capacity: parseInt(capacityInput.value) || 0
-                });
-            }
-        });
-
-        // Save the site
-        const siteId = editor.dataset.siteId;
-        const method = siteId ? 'PUT' : 'POST';
-        const url = `https://fmm-reservas-api.onrender.com/api/sites${siteId ? '/' + siteId : ''}`;
-
-        const saveResponse = await fetch(url, {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(siteData)
-        });
-
-        if (saveResponse.ok) {
-            // Manually show success alert since toast might not be available
-            alert('Site saved successfully!');
-            
-            // Reload the sites section without full page refresh
-            const sitesSection = document.getElementById('sites-section');
-            if (sitesSection) {
-                await loadSites();
-            }
-
-            // If it was a new site, remove the editor
-            if (!siteId) {
-                editor.remove();
-            }
-        } else {
-            // Show error message
-            alert('Error saving site. Please try again.');
-        }
-
+        // Continue with saving site data...
+        // Rest of your existing save site code
     } catch (error) {
         console.error('Error saving site:', error);
-        // Use alert instead of toast
         alert('Error saving site. Please try again.');
     } finally {
         toggleLoading(false, editor.id || 'sites-list');

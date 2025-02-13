@@ -39,6 +39,12 @@ function validateRequired(inputElement) {
     showSuccess(inputElement);
     return true;
 }
+function isValidImageUrl(url) {
+    return url && (
+        url.startsWith('https://res.cloudinary.com/') || 
+        url.startsWith('http://res.cloudinary.com/')
+    );
+}
 
 // Validate name (letters and spaces only)
 function validateName(inputElement) {

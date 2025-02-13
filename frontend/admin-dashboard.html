@@ -283,19 +283,22 @@
             <template id="site-editor-template">
                 <div class="site-editor">
                     <!-- Add this inside the site-editor template -->
-<div class="form-group">
-    <label>Site Image:</label>
-    <div class="image-upload-container">
-        <img id="preview-image" 
-     src="/public/images/placeholder-image.jpg" 
-     class="preview-image hidden" 
-     alt="Preview">
-        <input type="file" class="site-image" accept="image/*" onchange="previewImage(this)">
-        <div class="upload-progress hidden">
-            <div class="progress-bar"></div>
-        </div>
-    </div>
-</div>
+                    <div class="form-group">
+                        <label>Site Image:</label>
+                        <div class="image-upload-container">
+                            <img id="preview-image" 
+                                 src="https://res.cloudinary.com/ydbripkyv7/image/upload/v1/heritage-sites/placeholder-image"
+                                 class="preview-image hidden" 
+                                 alt="Preview">
+                            <input type="file" 
+                                   class="site-image" 
+                                   accept="image/*" 
+                                   onchange="previewImage(this)">
+                            <div class="upload-progress hidden">
+                                <div class="progress-bar"></div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label>Site Name:</label>
                         <input type="text" class="site-name" required>
