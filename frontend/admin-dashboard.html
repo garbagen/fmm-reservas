@@ -222,6 +222,28 @@
         opacity: 1;
     }
 }
+.analytics-dashboard {
+    margin: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chart-container {
+    margin-bottom: 30px;
+}
+
+.chart {
+    background: white;
+}
+
+@media (max-width: 768px) {
+    .analytics-dashboard {
+        margin: 10px;
+        padding: 10px;
+    }
+}
     </style>
 </head>
 <body>
@@ -391,13 +413,17 @@
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Scripts -->
-    <script src="utils/toast.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.2/Recharts.js"></script>
-<script src="DashboardAnalytics.js" type="module"></script>
+<!-- External Dependencies -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/recharts@2.12.2/umd/Recharts.min.js"></script>
+
+<!-- Utility Scripts -->
+<script src="utils/toast.js"></script>
+
+<!-- Application Scripts -->
+<script src="DashboardAnalytics.js"></script>  <!-- Remove type="module" -->
 <script src="admin-dashboard.js"></script>
 </body>
 </html>
