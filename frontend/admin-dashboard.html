@@ -431,7 +431,15 @@
     document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('dashboard-analytics');
         if (container && window.DashboardAnalytics) {
-            ReactDOM.render(React.createElement(window.DashboardAnalytics), container);
+            try {
+                ReactDOM.render(React.createElement(window.DashboardAnalytics), container);
+            } catch (error) {
+                console.error('Error initializing dashboard:', error);
+                container.innerHTML = '<div class="error-message">Error loading dashboard analytics</div>';
+            }
+        } else {
+            console.error('Missing required elements:',
+                !container ? 'No container found' : 'DashboardAnalytics not loaded');
         }
     });
 </script>
