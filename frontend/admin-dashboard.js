@@ -14,9 +14,17 @@ function getCurrentTab() {
     const bookingsSection = document.getElementById('bookings-section');
     return bookingsSection.classList.contains('active') ? 'bookings' : 'sites';
 }
-
+function updateUploadProgress(editor, progress) {
+    const progressBar = editor.querySelector('.progress-bar');
+    const progressContainer = editor.querySelector('.upload-progress');
+    
+    if (progressContainer && progressBar) {
+        progressContainer.classList.remove('hidden');
+        progressBar.style.width = `${progress}%`;
+    }
+}
 function previewImage(input) {
-    const preview = input.parentElement.querySelector('#preview-image');
+    const preview = input.closest('.image-upload-container').querySelector('#preview-image');
     const file = input.files[0];
     
     if (file) {
@@ -27,6 +35,12 @@ function previewImage(input) {
         }
         reader.readAsDataURL(file);
     }
+    
+    // Reset progress bar
+    const progressContainer = input.closest('.image-upload-container').querySelector('.upload-progress');
+    const progressBar = progressContainer.querySelector('.progress-bar');
+    progressBar.style.width = '0%';
+    progressContainer.classList.add('hidden');
 }
 
 function toggleLoading(isLoading, containerId) {
@@ -205,50 +219,71 @@ async function saveSite(button) {
     toggleLoading(true, editor.id || 'sites-list');
 
     try {
-        // Handle image upload first
-        const imageInput = editor.querySelector('.site-image');
-        let imageUrl = editor.dataset.imageUrl;
+        // Get form data
+        const siteData = {
+            name: editor.querySelector('.site-name').value,
+            description: editor.querySelector('.site-description').value,
+            timeSlots: []
+        };
 
+        // Get time slots
+        const slotsContainer = editor.querySelector('.slots-list');
+        const slotElements = slotsContainer.querySelectorAll('.slot-item');
+        
+        slotElements.forEach(slot => {
+            const time = slot.querySelector('.slot-time').value;
+            const capacity = parseInt(slot.querySelector('.slot-capacity').value);
+            if (time && !isNaN(capacity)) {
+                siteData.timeSlots.push({ time, capacity });
+            }
+        });
+
+        // Handle image upload first if there's a file
+        const imageInput = editor.querySelector('.site-image');
         if (imageInput && imageInput.files && imageInput.files[0]) {
             const formData = new FormData();
             formData.append('image', imageInput.files[0]);
 
-            try {
-                const uploadResponse = await fetch('https://fmm-reservas-api.onrender.com/api/sites/upload', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
+            const uploadResponse = await fetch('https://fmm-reservas-api.onrender.com/api/sites/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
 
-                if (!uploadResponse.ok) {
-                    throw new Error('Image upload failed');
-                }
-
-                const uploadResult = await uploadResponse.json();
-                imageUrl = uploadResult.imageUrl;
-                console.log('Image uploaded successfully:', imageUrl);
-            } catch (uploadError) {
-                console.error('Error uploading image:', uploadError);
-                alert('Error uploading image. Please try again.');
-                return;
+            if (!uploadResponse.ok) {
+                throw new Error('Image upload failed');
             }
+
+            const uploadResult = await uploadResponse.json();
+            siteData.imageUrl = uploadResult.imageUrl;
         }
 
-        // Prepare site data with image URL
-        const siteData = {
-            name: editor.querySelector('.site-name').value,
-            description: editor.querySelector('.site-description').value,
-            imageUrl: imageUrl,
-            timeSlots: []
-        };
+        // Save or update the site
+        const siteId = editor.dataset.siteId;
+        const url = siteId 
+            ? `https://fmm-reservas-api.onrender.com/api/sites/${siteId}`
+            : 'https://fmm-reservas-api.onrender.com/api/sites';
 
-        // Continue with saving site data...
-        // Rest of your existing save site code
+        const response = await fetch(url, {
+            method: siteId ? 'PUT' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(siteData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save site');
+        }
+
+        window.toast.success(siteId ? 'Site updated successfully!' : 'Site created successfully!');
+        await loadSites(); // Refresh the list
     } catch (error) {
         console.error('Error saving site:', error);
-        alert('Error saving site. Please try again.');
+        window.toast.error(error.message || 'Error saving site');
     } finally {
         toggleLoading(false, editor.id || 'sites-list');
     }
