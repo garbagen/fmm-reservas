@@ -418,6 +418,7 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/recharts@2.12.2/umd/Recharts.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 <!-- Utility Scripts -->
 <script src="utils/toast.js"></script>
@@ -425,14 +426,14 @@
 <!-- Application Scripts -->
 <script src="DashboardAnalytics.js"></script>  <!-- Remove type="module" -->
 <script src="admin-dashboard.js"></script>
-    <!-- Initialize Analytics -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('dashboard-analytics');
-            if (container && window.DashboardAnalytics) {
-                ReactDOM.render(React.createElement(window.DashboardAnalytics), container);
-            }
-        });
-    </script>
+<!-- Initialize Analytics -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('dashboard-analytics');
+        if (container && window.DashboardAnalytics) {
+            ReactDOM.render(React.createElement(window.DashboardAnalytics), container);
+        }
+    });
+</script>
 </body>
 </html>
