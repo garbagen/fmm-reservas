@@ -3,7 +3,7 @@ import os
 def create_project_structure(source_folder, output_file, ignore_folders=None, ignore_extensions=None):
     # Set default ignored folders and extensions if not provided
     if ignore_folders is None:
-        ignore_folders = ['backend' + os.sep + 'node_modules', '.git', 'uploads', 'copia']
+        ignore_folders = ['backend' + os.sep + 'node_modules', 'frontend' + os.sep + 'node_modules', '.git', 'uploads', 'copia']
     if ignore_extensions is None:
         ignore_extensions = ['.bak']
 

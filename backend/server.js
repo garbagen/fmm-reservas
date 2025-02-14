@@ -252,131 +252,143 @@ app.get('/api/bookings', authenticateToken, async (req, res) => {
 // In server.js - Update the availability endpoint
 app.get('/api/sites/:siteId/availability/:month', async (req, res) => {
     try {
-        const { siteId, month } = req.params;
-        const site = await Site.findById(siteId);
-        
-        if (!site) {
-            return res.status(404).json({ error: 'Site not found' });
+      const { siteId, month } = req.params;
+      
+      // Parse the month parameter (format: "2024-2" for February 2024)
+      const [year, monthNum] = month.split('-');
+      
+      // Create date range for the month
+      const startDate = new Date(year, monthNum - 1, 1);
+      const endDate = new Date(year, monthNum, 0); // Last day of the month
+      
+      // Format dates for query
+      const start = startDate.toISOString().split('T')[0];
+      const end = endDate.toISOString().split('T')[0];
+  
+      // Find the site
+      const site = await Site.findById(siteId);
+      if (!site) {
+        return res.status(404).json({ error: 'Site not found' });
+      }
+  
+      // Get all bookings for this site in the date range
+      const bookings = await Booking.find({
+        siteName: site.name,
+        date: {
+          $gte: start,
+          $lte: end
         }
-
-        // Parse the month parameter (format: "2024-2" for February 2024)
-        const [year, monthNum] = month.split('-');
-        const startDate = new Date(year, monthNum - 1, 1);
-        const endDate = new Date(year, monthNum, 0); // Last day of the month
+      });
+  
+      // Initialize availability object
+      const availability = {};
+  
+      // Helper function to get bookings for a specific date
+      const getBookingsForDate = (date) => {
+        return bookings.filter(booking => booking.date === date);
+      };
+  
+      // Calculate availability for each day in the month
+      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0];
+        const dateBookings = getBookingsForDate(dateStr);
         
-        // Format dates for query
-        const start = startDate.toISOString().split('T')[0];
-        const end = endDate.toISOString().split('T')[0];
-
-        // Get all bookings for this site in the date range
-        const bookings = await Booking.find({
-            siteName: site.name,
-            date: {
-                $gte: start,
-                $lte: end
-            }
+        // Get time slot availability
+        const timeSlots = {};
+        let allSlotsFull = true;
+  
+        // Check each time slot
+        site.timeSlots.forEach(slot => {
+          if (!slot.time || !slot.capacity) return;
+  
+          const slotBookings = dateBookings.filter(b => b.time === slot.time);
+          const booked = slotBookings.length;
+          const remaining = slot.capacity - booked;
+  
+          timeSlots[slot.time] = {
+            capacity: slot.capacity,
+            booked,
+            remaining
+          };
+  
+          if (remaining > 0) {
+            allSlotsFull = false;
+          }
         });
-
-        // Calculate availability for each day
-        let availability = {};
-        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-            const dateStr = d.toISOString().split('T')[0];
-            const dayBookings = bookings.filter(b => b.date === dateStr);
-            
-            // Track time slot-specific availability
-            const timeSlots = {};
-            let allSlotsFull = true;
-
-            site.timeSlots.forEach(slot => {
-                if (!slot.time) return;
-                
-                const slotBookings = dayBookings.filter(b => b.time === slot.time);
-                const remaining = slot.capacity - slotBookings.length;
-                
-                timeSlots[slot.time] = {
-                    capacity: slot.capacity,
-                    booked: slotBookings.length,
-                    remaining: remaining
-                };
-
-                if (remaining > 0) {
-                    allSlotsFull = false;
-                }
-            });
-
-            availability[dateStr] = {
-                fullyBooked: allSlotsFull,
-                timeSlots: timeSlots
-            };
-        }
-
-        res.json(availability);
+  
+        availability[dateStr] = {
+          fullyBooked: allSlotsFull,
+          timeSlots
+        };
+      }
+  
+      res.json(availability);
     } catch (error) {
-        console.error('Error getting availability:', error);
-        res.status(500).json({ 
-            error: 'Error calculating availability',
-            message: error.message 
-        });
+      console.error('Error getting availability:', error);
+      res.status(500).json({ 
+        error: 'Error calculating availability',
+        message: error.message 
+      });
     }
-});
+  });
 // Add this validation middleware before creating a booking
 app.post('/api/bookings', async (req, res) => {
     try {
-        const { siteName, visitorName, date, time } = req.body;
-        
-        // Find the site to check capacity
-        const site = await Site.findOne({ name: siteName });
-        if (!site) {
-            return res.status(404).json({ 
-                error: 'Site not found',
-                message: 'The selected site does not exist'
-            });
-        }
-
-        // Find the time slot
-        const timeSlot = site.timeSlots.find(slot => slot.time === time);
-        if (!timeSlot) {
-            return res.status(400).json({
-                error: 'Invalid time slot',
-                message: 'The selected time slot is not valid'
-            });
-        }
-
-        // Count existing bookings for this slot
-        const existingBookings = await Booking.countDocuments({
-            siteName,
-            date,
-            time
+      const { siteName, visitorName, date, time } = req.body;
+      
+      // Find the site
+      const site = await Site.findOne({ name: siteName });
+      if (!site) {
+        return res.status(404).json({ 
+          error: 'Site not found',
+          message: 'The selected site does not exist'
         });
-
-        // Check capacity
-        if (existingBookings >= timeSlot.capacity) {
-            return res.status(400).json({
-                error: 'Capacity exceeded',
-                message: 'This time slot is fully booked'
-            });
-        }
-
-        // If validation passes, create the booking
-        const newBooking = new Booking({
-            siteName,
-            visitorName,
-            date,
-            time,
-            createdAt: new Date()
+      }
+  
+      // Find the time slot
+      const timeSlot = site.timeSlots.find(slot => slot.time === time);
+      if (!timeSlot) {
+        return res.status(400).json({
+          error: 'Invalid time slot',
+          message: 'The selected time slot is not valid'
         });
-
-        await newBooking.save();
-        console.log('Booking saved:', newBooking);
-        res.status(201).json(newBooking);
+      }
+  
+      // Count existing bookings for this slot
+      const existingBookings = await Booking.countDocuments({
+        siteName,
+        date,
+        time
+      });
+  
+      // Check capacity
+      if (existingBookings >= timeSlot.capacity) {
+        return res.status(400).json({
+          error: 'Capacity exceeded',
+          message: 'This time slot is fully booked'
+        });
+      }
+  
+      // Create the booking
+      const newBooking = new Booking({
+        siteName,
+        visitorName,
+        date,
+        time,
+        createdAt: new Date()
+      });
+  
+      await newBooking.save();
+      
+      res.status(201).json(newBooking);
     } catch (error) {
-        console.error('Error creating booking:', error);
-        res.status(500).json({
-            error: 'Error creating booking',
-            message: error.message
-        });
+      console.error('Error creating booking:', error);
+      res.status(500).json({
+        error: 'Error creating booking',
+        message: error.message
+      });
     }
-});
+  });
 
 app.delete('/api/bookings/:id', authenticateToken, async (req, res) => {
     try {

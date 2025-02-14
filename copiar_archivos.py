@@ -5,7 +5,7 @@ def copy_files():
     # Set specific paths
     source_folder = r"C:\Users\gabyr\fmm"
     destination_folder = r"C:\Users\gabyr\fmm\copia"
-    folders_to_ignore = ['backend\\node_modules', 'backend\\uploads', '.git']
+    folders_to_ignore = ['backend\\node_modules', 'backend\\uploads', '.git', 'frontend\\node_modules', 'frontend-old']
     
     # Create destination folder if it doesn't exist
     os.makedirs(destination_folder, exist_ok=True)

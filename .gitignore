@@ -12,6 +12,7 @@ node_modules/
 /frontend/dist
 /frontend/build
 
+
 # Logs
 logs
 *.log
@@ -41,5 +42,6 @@ pids
 *.sw?
 
 # Upload directory
+/frontend-old/*
 /backend/uploads/*
 !/backend/uploads/.gitkeep
