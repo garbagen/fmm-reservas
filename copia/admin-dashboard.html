@@ -1,0 +1,450 @@
+<!-- frontend/admin-dashboard.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard-container {
+            padding: 20px;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .nav-tab.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .logout-button {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .booking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .booking-table th, 
+        .booking-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .booking-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .booking-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .site-editor {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .time-slots {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .slot-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+
+        .add-button {
+            background-color: #28a745;
+        }
+
+        .delete-button {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .status-active {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-past {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            color: white;
+        }
+
+        .save-button {
+            background-color: #007bff;
+        }
+        .toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.toast {
+    min-width: 200px;
+    margin: 10px;
+    padding: 15px 20px;
+    border-radius: 4px;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: slideIn 0.3s ease-in-out;
+}
+
+.toast.success {
+    background-color: #4caf50;
+    color: white;
+}
+
+.toast.error {
+    background-color: #f44336;
+    color: white;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0 5px;
+    font-size: 20px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+.analytics-dashboard {
+    margin: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chart-container {
+    margin-bottom: 30px;
+}
+
+.chart {
+    background: white;
+}
+
+@media (max-width: 768px) {
+    .analytics-dashboard {
+        margin: 10px;
+        padding: 10px;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="top-bar">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('bookings')">Bookings</button>
+                <button class="nav-tab" onclick="showSection('sites')">Manage Sites</button>
+            </div>
+            <button onclick="logout()" class="logout-button">Logout</button>
+        </div>
+
+        <!-- Bookings Section -->
+        <div id="bookings-section" class="section active">
+            <div id="analytics-container">
+                <div id="dashboard-analytics"></div>
+            </div>
+        
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Total Bookings</h3>
+                    <p id="total-bookings">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Today's Bookings</h3>
+                    <p id="today-bookings">0</p>
+                </div>
+            </div>
+            <div class="admin-controls">
+                <div class="search-filter-group">
+                    <input 
+                        type="text" 
+                        id="booking-search" 
+                        placeholder="Search by visitor name or site..."
+                        class="search-input"
+                    >
+                    <select id="date-filter" class="filter-select">
+                        <option value="all">All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                    <select id="status-filter" class="filter-select">
+                        <option value="all">All Status</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="past">Past</option>
+                    </select>
+                </div>
+                <div class="action-buttons">
+                    <button onclick="exportBookings('csv')" class="export-button">
+                        Export to CSV
+                    </button>
+                    <button onclick="exportBookings('excel')" class="export-button">
+                        Export to Excel
+                    </button>
+                </div>
+            </div>
+
+            <div class="bookings-container">
+                <div class="bulk-actions">
+                    <label>
+                        <input type="checkbox" id="select-all-bookings"> Select All
+                    </label>
+                    <button onclick="deleteSelectedBookings()" class="bulk-action-button" disabled>
+                        Delete Selected
+                    </button>
+                    <button onclick="exportSelectedBookings('csv')" class="bulk-action-button" disabled>
+                        Export Selected
+                    </button>
+                </div>
+                <table class="booking-table">
+                    <thead>
+                        <tr>
+                            <th width="40px"><input type="checkbox" id="select-all-header"></th>
+                            <th>Date</th>
+                            <th>Visitor Name</th>
+                            <th>Site</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Booking Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookings-list">
+                        <!-- Bookings will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Add this modal for booking details -->
+            <div id="booking-details-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Booking Details</h2>
+                    <div id="booking-details-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sites Section -->
+        <div id="sites-section" class="section">
+            <div class="admin-header">
+                <h1>Heritage Sites Management</h1>
+                <button onclick="addNewSite()" class="add-button">Add New Site</button>
+            </div>
+
+            <div id="sites-list">
+                <!-- Sites will be loaded here -->
+            </div>
+
+            <!-- Template for a new site editor -->
+            <template id="site-editor-template">
+                <div class="site-editor">
+                    <!-- Add this inside the site-editor template -->
+                    <div class="form-group">
+                        <label>Site Image:</label>
+                        <div class="image-upload-container">
+                            <img id="preview-image" 
+                            src="https://res.cloudinary.com/dbripkyv7/image/upload/v1739402716/placeholder-image_i7avqp.jpg"
+                                 class="preview-image hidden" 
+                                 alt="Preview">
+                            <input type="file" 
+                                   class="site-image" 
+                                   accept="image/*" 
+                                   onchange="previewImage(this)">
+                            <div class="upload-progress hidden">
+                                <div class="progress-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Site Name:</label>
+                        <input type="text" class="site-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description:</label>
+                        <textarea class="site-description" rows="3" required></textarea>
+                    </div>
+
+                    <div class="time-slots">
+                        <h3>Time Slots</h3>
+                        <div class="slots-list">
+                            <!-- Time slots will be added here -->
+                        </div>
+                        <button onclick="addTimeSlot(this)" class="add-button">Add Time Slot</button>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="saveSite(this)" class="save-button">Save Site</button>
+                        <button onclick="deleteSite(this)" class="delete-button">Delete Site</button>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Template for a time slot -->
+            <template id="time-slot-template">
+                <div class="slot-item">
+                    <input type="time" class="slot-time" required>
+                    <input type="number" class="slot-capacity" placeholder="Capacity" min="1" required>
+                    <button onclick="removeTimeSlot(this)" class="delete-button">Remove</button>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+<!-- External Dependencies -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/recharts@2.12.2/umd/Recharts.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<!-- Utility Scripts -->
+<script src="js/utils/toast.js"></script>
+<script src="js/utils/admin-utils.js"></script>
+
+<!-- Application Scripts -->
+<script src="js/modules/bookingsManager.js"></script>
+<script src="js/modules/siteManager.js"></script>
+<script src="js/components/DashboardAnalytics.js"></script>  <!-- Remove type="module" -->
+<script src="js/admin-dashboard.js"></script>
+<!-- Initialize Analytics -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('dashboard-analytics');
+        if (container && window.DashboardAnalytics) {
+            try {
+                ReactDOM.render(React.createElement(window.DashboardAnalytics), container);
+            } catch (error) {
+                console.error('Error initializing dashboard:', error);
+                container.innerHTML = '<div class="error-message">Error loading dashboard analytics</div>';
+            }
+        } else {
+            console.error('Missing required elements:',
+                !container ? 'No container found' : 'DashboardAnalytics not loaded');
+        }
+    });
+</script>
+</body>
+</html>

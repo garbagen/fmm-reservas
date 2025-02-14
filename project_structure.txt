@@ -1,0 +1,54 @@
+fmm
+│   └── .gitignore
+│   └── build.sh
+│   └── codigo_power.txt
+│   └── copiar_archivos.py
+│   └── generar_estructura.py
+│   └── old.rar
+│   └── project_structure.txt
+│   └── proyect_structure.txt
+│   └── railway.toml
+├── backend
+│   └── .env
+│   └── package-lock.json
+│   └── package.json
+│   └── server.js
+│   ├── config
+│   │   └── index.js
+│   ├── data
+│   │   └── bookings.json
+│   │   └── sites.json
+│   ├── middleware
+│   │   └── errorHandler.js
+│   │   └── rateLimiter.js
+│   │   └── uploadMiddleware.js
+│   ├── services
+│   │   └── cloudinary.js
+├── frontend
+│   └── .env
+│   ├── css
+│   │   └── styles.css
+│   ├── js
+│   │   └── admin-dashboard.js
+│   │   └── script.js
+│   │   ├── components
+│   │   │   └── DashboardAnalytics.js
+│   │   │   └── SiteSearchAndFilter.js
+│   │   ├── modules
+│   │   │   └── authManager.js
+│   │   │   └── bookingsManager.js
+│   │   │   └── siteManager.js
+│   │   ├── utils
+│   │   │   └── admin-utils
+│   │   │   └── calendar.js
+│   │   │   └── datetime.js
+│   │   │   └── toast.js
+│   │   │   └── validation.js
+│   ├── pages
+│   │   └── admin-dashboard.html
+│   │   └── index.html
+│   │   └── login.html
+│   ├── public
+│   │   ├── images
+│   │   │   └── placeholder-image.jpg
+│   │   │   └── placeholder.jpg

@@ -19,10 +19,7 @@ const config = {
       mongoUri: process.env.MONGODB_URI,
       jwtSecret: process.env.JWT_SECRET,
       port: process.env.PORT || 3000,
-      corsOrigin: [
-        'https://fmm-reservas.onrender.com',
-        'https://heritage-frontend.onrender.com' // Add your new frontend URL
-      ],
+      corsOrigin: process.env.FRONTEND_URL, // Your production frontend URL
       adminUsername: process.env.ADMIN_USERNAME,
       adminPassword: process.env.ADMIN_PASSWORD,
       cloudinary: {
