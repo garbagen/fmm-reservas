@@ -57,8 +57,8 @@ const TimeSlotPicker = ({ slots, selectedTime, onTimeSelect }) => {
                     ${selectedTime === slot.time
                       ? 'border-blue-500 bg-blue-50 text-blue-700 ring-2 ring-blue-500'
                       : slot.capacity > 0
-                        ? 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100 text-gray-800'
-                        : 'border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed'
+                        ? 'border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 active:bg-blue-100'
+                        : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
                     }
                   `}
                   aria-label={`Select time slot ${formatTime(slot.time)}`}
