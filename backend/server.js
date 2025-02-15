@@ -116,7 +116,8 @@ const authenticateToken = async (req, res, next) => {
 // CORS configuration for Render
 app.use(cors({
     origin: [
-        'https://fmm-reservas.onrender.com',    
+        'https://fmm-reservas.onrender.com',
+        'https://heritage-frontend.onrender.com',   
         'http://localhost:5173',                
         'http://localhost:3000'                 
     ],
