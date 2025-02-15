@@ -1,0 +1,72 @@
+fmm
+│   └── .gitignore
+│   └── build.sh
+│   └── codigo_power.txt
+│   └── copiar_archivos.py
+│   └── generar_estructura.py
+│   └── project_structure.txt
+│   └── railway.toml
+├── backend
+│   └── .env
+│   └── package-lock.json
+│   └── package.json
+│   └── server.js
+│   ├── config
+│   │   └── index.js
+│   ├── data
+│   │   └── bookings.json
+│   │   └── sites.json
+│   ├── middleware
+│   │   └── errorHandler.js
+│   │   └── rateLimiter.js
+│   │   └── uploadMiddleware.js
+│   ├── services
+│   │   └── cloudinary.js
+├── frontend
+│   └── .env
+│   └── .gitignore
+│   └── eslint.config.js
+│   └── index.html
+│   └── package-lock.json
+│   └── package.json
+│   └── postcss.config.js
+│   └── README.md
+│   └── render.yaml
+│   └── tailwind.config.js
+│   └── vite.config.js
+│   ├── public
+│   │   └── vite.svg
+│   ├── src
+│   │   └── App.css
+│   │   └── App.jsx
+│   │   └── index.css
+│   │   └── main.jsx
+│   │   ├── assets
+│   │   │   └── react.svg
+│   │   ├── components
+│   │   │   └── AdminLogin.jsx
+│   │   │   └── Alert.jsx
+│   │   │   └── BookingModal.jsx
+│   │   │   └── CalendarPicker.jsx
+│   │   │   └── HeritageCard.jsx
+│   │   │   └── HeritageGrid.jsx
+│   │   │   └── Navbar.jsx
+│   │   │   └── TimeSlotPicker.jsx
+│   │   │   ├── AdminDashboard
+│   │   │   │   └── BookingList.jsx
+│   │   │   │   └── index.jsx
+│   │   │   │   └── SiteList.jsx
+│   │   │   │   ├── Table
+│   │   │   │   │   └── index.jsx
+│   │   │   │   │   └── utils.jsx
+│   │   │   │   │   ├── components
+│   │   │   │   │   │   └── FilterMenu.jsx
+│   │   │   │   │   │   └── MobileItem.jsx
+│   │   │   │   │   │   └── Pagination.jsx
+│   │   │   │   │   │   └── PullToRefresh.jsx
+│   │   │   │   │   │   └── SwipeableRow.jsx
+│   │   │   │   │   │   └── TableHeader.jsx
+│   │   │   │   │   │   └── TableRow.jsx
+│   │   │   │   │   │   └── Toolbar.jsx
+│   │   ├── context
+│   │   │   └── AuthContext.jsx
