@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Loader, User } from 'lucide-react';
+import Alert from './Alert';
+import CalendarPicker from './CalendarPicker';
+import TimeSlotPicker from './TimeSlotPicker';
 
 const BookingModal = ({ isOpen, onClose, site }) => {
   const [formData, setFormData] = useState({
@@ -7,142 +10,206 @@ const BookingModal = ({ isOpen, onClose, site }) => {
     date: '',
     time: '',
   });
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [step, setStep] = useState(1); // 1: Name, 2: Date & Time
 
   if (!isOpen) return null;
 
+  const validateName = () => {
+    if (!formData.visitorName.trim()) {
+      setErrors({ visitorName: 'Name is required' });
+      return false;
+    }
+    if (formData.visitorName.length < 2) {
+      setErrors({ visitorName: 'Name must be at least 2 characters' });
+      return false;
+    }
+    return true;
+  };
+
+  const handleNextStep = () => {
+    if (validateName()) {
+      setStep(2);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setSubmitError('');
+    
+    if (!formData.date || !formData.time) {
+      setErrors({ booking: 'Please select both date and time' });
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Log the request data for debugging
-      console.log('Sending booking request:', {
-        siteName: site.name, // Changed from site._id to site.name
-        ...formData
-      });
-
       const response = await fetch(`${import.meta.env.VITE_API_URL}/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          siteName: site.name, // Changed from site._id to site.name
+          siteName: site.name,
           ...formData,
         }),
       });
 
       const data = await response.json();
-      console.log('Response:', data); // Debug log
 
       if (!response.ok) {
         throw new Error(data.message || data.error || 'Failed to create booking');
       }
 
-      alert('Booking successful!');
-      onClose();
-      setFormData({ visitorName: '', date: '', time: '' }); // Reset form
+      setSuccess(true);
+      setTimeout(() => {
+        onClose();
+        setFormData({ visitorName: '', date: '', time: '' });
+        setSuccess(false);
+        setStep(1);
+      }, 2000);
     } catch (error) {
-      console.error('Booking error:', error); // Debug log
-      setError(error.message);
+      setSubmitError(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleDateSelect = (date) => {
+    setFormData(prev => ({ ...prev, date }));
+    setErrors(prev => ({ ...prev, booking: '' }));
   };
 
-  const today = new Date().toISOString().split('T')[0];
-
-  const getAvailableTimeSlots = () => {
-    return site.timeSlots?.filter(slot => slot.time && slot.capacity > 0) || [];
+  const handleTimeSelect = (time) => {
+    setFormData(prev => ({ ...prev, time }));
+    setErrors(prev => ({ ...prev, booking: '' }));
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl relative">
+        {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+          disabled={loading}
+          className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 disabled:opacity-50"
         >
           <X className="w-6 h-6" />
         </button>
 
         <div className="p-6">
+          {/* Header */}
           <h2 className="text-2xl font-bold mb-4">Book {site.name}</h2>
           
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
-              {error}
-            </div>
+          {/* Alerts */}
+          {submitError && (
+            <Alert variant="error" className="mb-4">{submitError}</Alert>
+          )}
+          {success && (
+            <Alert variant="success" className="mb-4">Booking successful! Redirecting...</Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Your Name
-              </label>
-              <input
-                type="text"
-                name="visitorName"
-                required
-                value={formData.visitorName}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          {/* Step 1: Name Input */}
+          {step === 1 ? (
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Your Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    value={formData.visitorName}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, visitorName: e.target.value }));
+                      setErrors({});
+                    }}
+                    className={`w-full pl-10 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 
+                      ${errors.visitorName ? 'border-red-500' : ''}`}
+                    placeholder="Enter your name"
+                  />
+                </div>
+                {errors.visitorName && (
+                  <p className="mt-1 text-sm text-red-600">{errors.visitorName}</p>
+                )}
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date
-              </label>
-              <input
-                type="date"
-                name="date"
-                required
-                min={today}
-                value={formData.date}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Time Slot
-              </label>
-              <select
-                name="time"
-                required
-                value={formData.time}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              <button
+                onClick={handleNextStep}
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg 
+                         hover:bg-blue-700 transition-colors"
               >
-                <option value="">Select a time slot</option>
-                {getAvailableTimeSlots().map((slot) => (
-                  <option key={slot.time} value={slot.time}>
-                    {slot.time} (Capacity: {slot.capacity})
-                  </option>
-                ))}
-              </select>
+                Continue to Booking
+              </button>
             </div>
+          ) : (
+            /* Step 2: Date and Time Selection */
+            <div className="space-y-6">
+              {/* Progress Steps */}
+              <div className="flex items-center justify-center space-x-2 mb-6">
+                <div className="w-2 h-2 rounded-full bg-blue-600" />
+                <div className="w-2 h-2 rounded-full bg-blue-600" />
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
-            >
-              {loading ? 'Booking...' : 'Confirm Booking'}
-            </button>
-          </form>
+              {/* Calendar */}
+              <div className="mb-6">
+                <h3 className="text-lg font-medium mb-3">Select Date</h3>
+                <CalendarPicker
+                  selectedDate={formData.date}
+                  onDateSelect={handleDateSelect}
+                  site={site}
+                />
+              </div>
+
+              {/* Time Slots */}
+              {formData.date && (
+                <div>
+                  <h3 className="text-lg font-medium mb-3">Select Time</h3>
+                  <TimeSlotPicker
+                    slots={site.timeSlots || []}
+                    selectedTime={formData.time}
+                    onTimeSelect={handleTimeSelect}
+                  />
+                </div>
+              )}
+
+              {errors.booking && (
+                <p className="text-sm text-red-600">{errors.booking}</p>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => setStep(1)}
+                  className="flex-1 py-2 px-4 border border-gray-300 rounded-lg 
+                           hover:bg-gray-50 transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading || !formData.date || !formData.time}
+                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg 
+                           hover:bg-blue-700 transition-colors disabled:bg-blue-300 
+                           flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader className="w-5 h-5 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Confirm Booking'
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

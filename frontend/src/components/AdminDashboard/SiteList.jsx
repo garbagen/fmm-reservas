@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Plus, Pencil, Trash2, X, Image } from 'lucide-react';
+import EnhancedAdminTable from './Table';
+import { Plus, X, Image } from 'lucide-react';
 
 const SiteList = () => {
   const [sites, setSites] = useState([]);
@@ -93,8 +94,6 @@ const SiteList = () => {
   };
 
   const handleDelete = async (siteId) => {
-    if (!window.confirm('Are you sure you want to delete this site?')) return;
-
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/sites/${siteId}`, {
         method: 'DELETE',
@@ -104,7 +103,25 @@ const SiteList = () => {
       });
 
       if (!response.ok) throw new Error('Failed to delete site');
-      fetchSites();
+      await fetchSites();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleBulkDelete = async (siteIds) => {
+    try {
+      await Promise.all(
+        siteIds.map(id =>
+          fetch(`${import.meta.env.VITE_API_URL}/sites/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+        )
+      );
+      await fetchSites();
     } catch (err) {
       setError(err.message);
     }
@@ -119,6 +136,14 @@ const SiteList = () => {
       timeSlots: site.timeSlots.length > 0 ? site.timeSlots : [{ time: '', capacity: '' }]
     });
     setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedSite(null);
+    setFormData(initialFormState);
+    setImageFile(null);
+    setError('');
   };
 
   const handleAddTimeSlot = () => {
@@ -141,23 +166,66 @@ const SiteList = () => {
     setFormData({ ...formData, timeSlots: newTimeSlots });
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedSite(null);
-    setFormData(initialFormState);
-    setImageFile(null);
-    setError('');
+  // Format time slots for display in the table
+  const formatTimeSlots = (slots) => {
+    if (!slots || slots.length === 0) return 'No time slots';
+    return slots
+      .filter(slot => slot.time && slot.capacity)
+      .map(slot => `${slot.time} (${slot.capacity})`)
+      .join(', ');
   };
+
+  const columns = [
+    {
+      key: 'name',
+      header: 'Name',
+      render: (value) => value
+    },
+    {
+      key: 'description',
+      header: 'Description',
+      render: (value) => (
+        <div className="max-w-xs truncate">
+          {value}
+        </div>
+      )
+    },
+    {
+      key: 'timeSlots',
+      header: 'Time Slots',
+      render: (value) => formatTimeSlots(value)
+    },
+    {
+      key: 'imageUrl',
+      header: 'Image',
+      render: (value) => (
+        value ? (
+          <img 
+            src={value} 
+            alt="Site" 
+            className="w-16 h-16 object-cover rounded"
+          />
+        ) : (
+          <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-gray-500">
+            No image
+          </div>
+        )
+      )
+    }
+  ];
 
   if (loading) return <div className="text-center">Loading...</div>;
 
   return (
     <div>
-      {/* Header with Add Button */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-900">Heritage Sites</h2>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setSelectedSite(null);
+            setFormData(initialFormState);
+            setIsModalOpen(true);
+          }}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -165,59 +233,20 @@ const SiteList = () => {
         </button>
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
           {error}
         </div>
       )}
 
-      {/* Sites Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sites.map((site) => (
-          <div key={site._id} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="relative h-48">
-              <img
-                src={site.imageUrl || "/api/placeholder/400/250"}
-                alt={site.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">{site.name}</h3>
-              <p className="text-gray-600 mb-4 line-clamp-2">{site.description}</p>
-              
-              <div className="mb-4">
-                <h4 className="font-medium mb-2">Time Slots:</h4>
-                <ul className="space-y-1">
-                  {site.timeSlots.map((slot, index) => (
-                    slot.time && (
-                      <li key={index} className="text-sm text-gray-600">
-                        {slot.time} - Capacity: {slot.capacity}
-                      </li>
-                    )
-                  ))}
-                </ul>
-              </div>
-
-              <div className="flex justify-end space-x-2">
-                <button
-                  onClick={() => handleEdit(site)}
-                  className="p-2 text-blue-600 hover:text-blue-800"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(site._id)}
-                  className="p-2 text-red-600 hover:text-red-800"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <EnhancedAdminTable
+        data={sites}
+        columns={columns}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+        onBulkDelete={handleBulkDelete}
+        filename="heritage-sites"
+      />
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
