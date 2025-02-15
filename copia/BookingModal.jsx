@@ -123,16 +123,18 @@ const BookingModal = ({ isOpen, onClose, site }) => {
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
-                    type="text"
-                    value={formData.visitorName}
-                    onChange={(e) => {
-                      setFormData(prev => ({ ...prev, visitorName: e.target.value }));
-                      setErrors({});
-                    }}
-                    className={`w-full pl-10 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 
-                      ${errors.visitorName ? 'border-red-500' : ''}`}
-                    placeholder="Enter your name"
-                  />
+  type="text"
+  value={formData.visitorName}
+  onChange={(e) => setFormData(prev => ({ ...prev, visitorName: e.target.value }))}
+  className="w-full pl-10 p-2 border rounded-lg
+    text-gray-900 
+    bg-white
+    border-gray-300
+    placeholder-gray-500
+    focus:ring-2 
+    focus:ring-blue-500"
+  placeholder="Enter your name"
+/>
                 </div>
                 {errors.visitorName && (
                   <p className="mt-1 text-sm text-red-600">{errors.visitorName}</p>

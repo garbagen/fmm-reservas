@@ -40,9 +40,6 @@ pids
 *.njsproj
 *.sln
 *.sw?
-copiar_archivos.py
-generar_estructura.py
-codigo_power.txt
 
 # Upload directory
 /frontend-old/*

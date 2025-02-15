@@ -103,7 +103,7 @@ const BookingModal = ({ isOpen, onClose, site }) => {
 
         <div className="p-6">
           {/* Header */}
-          <h2 className="text-2xl font-bold mb-4">Book {site.name}</h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">Book {site.name}</h2>
           
           {/* Alerts */}
           {submitError && (
@@ -130,9 +130,9 @@ const BookingModal = ({ isOpen, onClose, site }) => {
     text-gray-900 
     bg-white
     border-gray-300
-    placeholder-gray-500
+    placeholder-gray-400
     focus:ring-2 
-    focus:ring-blue-500"
+    focus:ring-blue-300"
   placeholder="Enter your name"
 />
                 </div>
@@ -153,14 +153,14 @@ const BookingModal = ({ isOpen, onClose, site }) => {
             /* Step 2: Date and Time Selection */
             <div className="space-y-6">
               {/* Progress Steps */}
-              <div className="flex items-center justify-center space-x-2 mb-6">
+              <div className="flex items-center justify-center space-x-2 mb-6 text-gray-900">
                 <div className="w-2 h-2 rounded-full bg-blue-600" />
                 <div className="w-2 h-2 rounded-full bg-blue-600" />
               </div>
 
               {/* Calendar */}
               <div className="mb-6">
-                <h3 className="text-lg font-medium mb-3">Select Date</h3>
+              <h3 className="text-lg font-medium mb-3 text-gray-900">Select Date</h3>
                 <CalendarPicker
                   selectedDate={formData.date}
                   onDateSelect={handleDateSelect}
@@ -171,7 +171,7 @@ const BookingModal = ({ isOpen, onClose, site }) => {
               {/* Time Slots */}
               {formData.date && (
                 <div>
-                  <h3 className="text-lg font-medium mb-3">Select Time</h3>
+                  <h3 className="text-lg font-medium mb-3 text-gray-900">Select Time</h3>
                   <TimeSlotPicker
                     slots={site.timeSlots || []}
                     selectedTime={formData.time}

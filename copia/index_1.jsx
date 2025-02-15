@@ -7,7 +7,7 @@ import Toolbar from './components/Toolbar';
 import TableHeader from './components/TableHeader';
 import TableRow from './components/TableRow';
 import Pagination from './components/Pagination';
-import FilterMenu from './components/FIlterMenu';
+import FilterMenu from './components/FilterMenu';
 import { sortData, filterData, paginateData } from './utils';
 
 const EnhancedAdminTable = ({

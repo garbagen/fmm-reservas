@@ -4,10 +4,13 @@ fmm
 │   └── codigo_power.txt
 │   └── copiar_archivos.py
 │   └── generar_estructura.py
+│   └── package.json
 │   └── project_structure.txt
 │   └── railway.toml
+│   └── render.yaml
 ├── backend
 │   └── .env
+│   └── .env.example
 │   └── package-lock.json
 │   └── package.json
 │   └── server.js
@@ -24,6 +27,7 @@ fmm
 │   │   └── cloudinary.js
 ├── frontend
 │   └── .env
+│   └── .env.example
 │   └── .gitignore
 │   └── eslint.config.js
 │   └── index.html
@@ -48,6 +52,8 @@ fmm
 │   │   │   └── Alert.jsx
 │   │   │   └── BookingModal.jsx
 │   │   │   └── CalendarPicker.jsx
+│   │   │   └── ErrorBoundary.jsx
+│   │   │   └── FormInput.jsx
 │   │   │   └── HeritageCard.jsx
 │   │   │   └── HeritageGrid.jsx
 │   │   │   └── Navbar.jsx

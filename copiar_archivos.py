@@ -6,7 +6,13 @@ def copy_files():
     destination_folder = r"C:\Users\gabyr\fmm\copia"
     folders_to_ignore = ['backend\\node_modules', 'backend\\uploads', '.git', 'frontend\\node_modules', 'frontend-old']
 
-    os.makedirs(destination_folder, exist_ok=True)
+    # Delete the destination folder if it exists
+    if os.path.exists(destination_folder):
+        print(f"Deleting existing folder: {destination_folder}")
+        shutil.rmtree(destination_folder)
+
+    # Create a fresh destination folder
+    os.makedirs(destination_folder)
     files_copied = 0
 
     for root, dirs, files in os.walk(source_folder):
