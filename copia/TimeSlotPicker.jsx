@@ -42,25 +42,25 @@ const TimeSlotPicker = ({ slots, selectedTime, onTimeSelect }) => {
       {Object.entries(groupedSlots).map(([period, periodSlots]) => (
         periodSlots.length > 0 && (
           <div key={period} className="space-y-3">
-            <h4 className="text-sm font-medium text-gray-700 px-1">
+            <h4 className="text-sm font-medium text-gray-800 px-1">
               {periodLabels[period]}
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {periodSlots.map((slot) => (
                 <button
-                  key={slot.time}
-                  onClick={() => onTimeSelect(slot.time)}
-                  disabled={slot.capacity <= 0}
-                  className={`
-                    flex items-center justify-between p-3 rounded-lg border
-                    transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2
-                    ${selectedTime === slot.time
-                      ? 'border-blue-500 bg-blue-50 text-blue-700 ring-2 ring-blue-500'
-                      : slot.capacity > 0
-                        ? 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100'
-                        : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                    }
-                  `}
+                key={slot.time}
+                onClick={() => onTimeSelect(slot.time)}
+                disabled={slot.capacity <= 0}
+                className={`
+                  flex items-center justify-between p-3 rounded-lg border
+                  transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2
+                  ${selectedTime === slot.time
+                    ? 'border-blue-500 bg-blue-50 text-blue-700 ring-2 ring-blue-500'
+                    : slot.capacity > 0
+                      ? 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 active:bg-blue-100'
+                      : 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                  }
+                `}
                   aria-label={`Select time slot ${formatTime(slot.time)}`}
                 >
                   <div className="flex items-center">

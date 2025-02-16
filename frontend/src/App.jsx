@@ -5,7 +5,9 @@ import AdminDashboard from './components/AdminDashboard';
 import AdminLogin from './components/AdminLogin';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
-import ErrorBoundary from './components/ErrorBoundary'; // Add this import
+import HeroSection from './components/HeroSection';
+import ThemeSwitcher from './components/ThemeSwitcher';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -21,7 +23,8 @@ const PublicLayout = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main>
+      <HeroSection />
+      <main className="pt-8">
         <HeritageGrid />
       </main>
     </div>

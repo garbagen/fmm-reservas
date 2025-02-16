@@ -14,7 +14,7 @@ const BookingModal = ({ isOpen, onClose, site }) => {
   const [submitError, setSubmitError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [step, setStep] = useState(1); // 1: Name, 2: Date & Time
+  const [step, setStep] = useState(1);
 
   if (!isOpen) return null;
 
@@ -27,6 +27,7 @@ const BookingModal = ({ isOpen, onClose, site }) => {
       setErrors({ visitorName: 'Name must be at least 2 characters' });
       return false;
     }
+    setErrors({});
     return true;
   };
 
@@ -36,9 +37,19 @@ const BookingModal = ({ isOpen, onClose, site }) => {
     }
   };
 
+  const handleDateSelect = (date) => {
+    setFormData(prev => ({ ...prev, date }));
+    setErrors(prev => ({ ...prev, booking: '' }));
+  };
+
+  const handleTimeSelect = (time) => {
+    setFormData(prev => ({ ...prev, time }));
+    setErrors(prev => ({ ...prev, booking: '' }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitError('');
+    if (!validateName()) return;
     
     if (!formData.date || !formData.time) {
       setErrors({ booking: 'Please select both date and time' });
@@ -46,6 +57,7 @@ const BookingModal = ({ isOpen, onClose, site }) => {
     }
 
     setLoading(true);
+    setSubmitError('');
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/bookings`, {
@@ -79,18 +91,8 @@ const BookingModal = ({ isOpen, onClose, site }) => {
     }
   };
 
-  const handleDateSelect = (date) => {
-    setFormData(prev => ({ ...prev, date }));
-    setErrors(prev => ({ ...prev, booking: '' }));
-  };
-
-  const handleTimeSelect = (time) => {
-    setFormData(prev => ({ ...prev, time }));
-    setErrors(prev => ({ ...prev, booking: '' }));
-  };
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl relative">
         {/* Close Button */}
         <button
@@ -103,7 +105,7 @@ const BookingModal = ({ isOpen, onClose, site }) => {
 
         <div className="p-6">
           {/* Header */}
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">Book {site.name}</h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">{site.name}</h2>
           
           {/* Alerts */}
           {submitError && (
@@ -123,18 +125,16 @@ const BookingModal = ({ isOpen, onClose, site }) => {
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
-  type="text"
-  value={formData.visitorName}
-  onChange={(e) => setFormData(prev => ({ ...prev, visitorName: e.target.value }))}
-  className="w-full pl-10 p-2 border rounded-lg
-    text-gray-900 
-    bg-white
-    border-gray-300
-    placeholder-gray-400
-    focus:ring-2 
-    focus:ring-blue-300"
-  placeholder="Enter your name"
-/>
+                    type="text"
+                    value={formData.visitorName}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, visitorName: e.target.value }));
+                      if (errors.visitorName) validateName();
+                    }}
+                    className="w-full pl-10 p-2 border rounded-lg text-gray-900 bg-white border-gray-300
+                             focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Enter your name"
+                  />
                 </div>
                 {errors.visitorName && (
                   <p className="mt-1 text-sm text-red-600">{errors.visitorName}</p>
@@ -153,14 +153,14 @@ const BookingModal = ({ isOpen, onClose, site }) => {
             /* Step 2: Date and Time Selection */
             <div className="space-y-6">
               {/* Progress Steps */}
-              <div className="flex items-center justify-center space-x-2 mb-6 text-gray-900">
+              <div className="flex items-center justify-center space-x-2 mb-6">
                 <div className="w-2 h-2 rounded-full bg-blue-600" />
                 <div className="w-2 h-2 rounded-full bg-blue-600" />
               </div>
 
               {/* Calendar */}
               <div className="mb-6">
-              <h3 className="text-lg font-medium mb-3 text-gray-900">Select Date</h3>
+                <h3 className="text-lg font-medium mb-3 text-gray-900">Select Date</h3>
                 <CalendarPicker
                   selectedDate={formData.date}
                   onDateSelect={handleDateSelect}
