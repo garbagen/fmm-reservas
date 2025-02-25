@@ -56,7 +56,9 @@ fmm
 │   │   │   └── FormInput.jsx
 │   │   │   └── HeritageCard.jsx
 │   │   │   └── HeritageGrid.jsx
+│   │   │   └── HeroSection.jsx
 │   │   │   └── Navbar.jsx
+│   │   │   └── ThemeSwitcher.jsx
 │   │   │   └── TimeSlotPicker.jsx
 │   │   │   ├── AdminDashboard
 │   │   │   │   └── BookingList.jsx
