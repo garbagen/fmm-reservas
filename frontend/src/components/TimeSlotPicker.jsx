@@ -1,7 +1,7 @@
 import React from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, Calendar } from 'lucide-react';
 
-const TimeSlotPicker = ({ slots, selectedTime, onTimeSelect }) => {
+const TimeSlotPicker = ({ slots, selectedTime, onTimeSelect, selectedDate }) => {
   const formatTime = (time) => {
     try {
       const [hours, minutes] = time.split(':');
@@ -17,8 +17,28 @@ const TimeSlotPicker = ({ slots, selectedTime, onTimeSelect }) => {
     }
   };
 
+  // Get day of week from selected date
+  const getDayOfWeek = (dateStr) => {
+    if (!dateStr) return null;
+    
+    const date = new Date(dateStr);
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    return days[date.getDay()];
+  };
+
+  const currentDay = getDayOfWeek(selectedDate);
+
+  // Filter slots based on the day of week
+  const filteredSlots = slots.filter(slot => {
+    // If no days property or empty days array, show on all days (backward compatibility)
+    if (!slot.days || slot.days.length === 0) return true;
+    
+    // Only show slots available on the current day of week
+    return slot.days.includes(currentDay);
+  });
+
   // Group time slots by morning/afternoon/evening
-  const groupedSlots = slots.reduce((acc, slot) => {
+  const groupedSlots = filteredSlots.reduce((acc, slot) => {
     if (!slot.time) return acc;
     
     const hour = parseInt(slot.time.split(':')[0]);
@@ -39,6 +59,15 @@ const TimeSlotPicker = ({ slots, selectedTime, onTimeSelect }) => {
 
   return (
     <div className="space-y-6">
+      {currentDay && (
+        <div className="flex items-center text-sm text-blue-600 mb-2">
+          <Calendar className="w-4 h-4 mr-2" />
+          <span className="capitalize">
+            {currentDay} Available Times
+          </span>
+        </div>
+      )}
+
       {Object.entries(groupedSlots).map(([period, periodSlots]) => (
         periodSlots.length > 0 && (
           <div key={period} className="space-y-3">

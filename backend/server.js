@@ -37,14 +37,15 @@ console.log('Attempting to connect to MongoDB with URI:', MONGODB_URI);
 
 // Define MongoDB Schemas
 const siteSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  imageUrl: { type: String },
-  timeSlots: [{
-    time: String,
-    capacity: Number
-  }]
-});
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    imageUrl: { type: String },
+    timeSlots: [{
+      time: String,
+      capacity: Number,
+      days: [String]  // Array of days for each time slot
+    }]
+  });
 
 const bookingSchema = new mongoose.Schema({
   siteName: { type: String, required: true },

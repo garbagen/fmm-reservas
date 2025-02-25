@@ -165,15 +165,16 @@ const BookingModal = ({ isOpen, onClose, site }) => {
 
               {/* Time Slots */}
               {formData.date && (
-                <div>
-                  <h3 className="heading-secondary mb-3">Select Time</h3>
-                  <TimeSlotPicker
-                    slots={site.timeSlots || []}
-                    selectedTime={formData.time}
-                    onTimeSelect={handleTimeSelect}
-                  />
-                </div>
-              )}
+  <div>
+    <h3 className="heading-secondary mb-3">Select Time</h3>
+    <TimeSlotPicker
+      slots={site.timeSlots || []}
+      selectedTime={formData.time}
+      onTimeSelect={handleTimeSelect}
+      selectedDate={formData.date}  // Add this line
+    />
+  </div>
+)}
 
               {errors.booking && (
                 <p className="text-red-600 text-sm">{errors.booking}</p>
